@@ -5,7 +5,7 @@ export default function MyList() {
     return (
         <ul>
             {
-                data.map((elem, index) => <li key={index}>List Item : {elem*6}</li>)
+                data.map((elem, index) => <li key={index}>List Item : {elem}</li>)
             }
         </ul>
     );
