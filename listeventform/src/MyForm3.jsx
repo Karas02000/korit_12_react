@@ -24,8 +24,8 @@ export default function MyForm3() {
             <lable>LastName</lable> <br />
             <input type="text" name="lastName" onChange={handleChange} value={user.lastName} /> <br />
             <lable>E-mail</lable> <br />
-            <input type="text" name="email" onChange={handleChange} value={user.email} /> <br />
-            <input type="submit" value="Submit" />
+            <input type="email" name="email" onChange={handleChange} value={user.email} /> <br />
+            <input type="submit" value="Submit" onClick={handleSubmit} />
         </form>
     );
-}
+}   

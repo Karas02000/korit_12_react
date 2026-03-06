@@ -1,4 +1,5 @@
-import Users from "./components/Users.jsx";
+import Users from "./Users.jsx";
+import "./App.css";
 
 export default function App() {
   return(
