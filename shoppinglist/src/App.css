@@ -1,0 +1,106 @@
+/* App.css */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa; /* 부드러운 배경색 */
+  min-height: 100vh;
+}
+/* 상단 바 아래 여백 */
+header.MuiAppBar-root {
+  margin-bottom: 2rem;
+}
+
+/* 컨테이너 중앙 정렬 및 여백 */
+.MuiContainer-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+/* 추가 버튼 스타일 커스텀 (AddItem2 내부 버튼용) */
+.add-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+/* 리스트 아이템 스타일 (데이터가 보일 때를 대비) */
+.item-list {
+  width: 100%;
+  max-width: 600px;
+  list-style: none;
+  padding: 0;
+}
+
+.item-card {
+  background: white;
+  margin-bottom: 10px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-name {
+  font-weight: bold;
+  color: #333;
+}
+
+.item-amount {
+  color: #666;
+  background: #e0e0e0;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+/* 리스트 전체를 감싸는 Paper 스타일 */
+.MuiPaper-root {
+  border-radius: 12px !important; /* 모서리를 더 둥글게 */
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 리스트 아이템 호버 효과 */
+.MuiListItem-root {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  padding: 12px 20px !important;
+}
+
+.MuiListItem-root:hover {
+  background-color: #f0f7ff !important; /* 마우스 올리면 연한 파란색 */
+  cursor: pointer;
+}
+
+/* 상품명(Primary text) 스타일 */
+.MuiListItemText-primary {
+  font-weight: 600 !important;
+  color: #2c3e50;
+  font-size: 1.1rem !important;
+}
+
+/* 수량(Secondary text) 스타일 */
+.MuiListItemText-secondary {
+  color: #7f8c8d !important;
+  margin-top: 4px !important;
+}
+
+/* 리스트가 비어있을 때의 스타일 */
+.empty-message {
+  padding: 40px;
+  text-align: center;
+  color: #bdc3c7;
+}
+
+/* 추가 버튼 애니메이션 */
+.add-button-container button {
+  transition: transform 0.2s ease-in-out !important;
+}
+
+.add-button-container button:hover {
+  transform: scale(1.05); /* 버튼이 살짝 커지는 효과 */
+}
