@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { 
+  Container, AppBar, Toolbar, Typography, 
+  List, ListItem, ListItemText, Paper 
+} from '@mui/material';
+import { useState } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// 1. 타입 정의 (AddItem2에서도 사용하기 위해 export)
+export type Item = {
+  product: string;
+  amount: string;
+  price: number;
 }
 
-export default App
+function App() {
+  const [items, setItems] = useState<Item[]>([]);
+
+  // 2. 새 아이템을 리스트 맨 앞에 추가하는 함수
+  const addItem = (item: Item) => {
+    setItems([item, ...items]);
+  };
+
+  return (
+    <Container maxWidth="sm" className="main-container">
+      <AppBar position="static" elevation={0} className="app-bar">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+            Todo List 🗒️
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <div>
+        
+      </div>
+    </Container>
+  );
+}
+
+export default App;
