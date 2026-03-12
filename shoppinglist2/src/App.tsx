@@ -55,9 +55,9 @@ function App() {
                     <>
                       <Typography component="span" variant="body2" color="text.primary">
                         수량 : {it.amount}
-                      </Typography>
-                      <br />
+                        <br />
                         가격 : ${it.price}
+                      </Typography>
                     </>
                   }
                 />
