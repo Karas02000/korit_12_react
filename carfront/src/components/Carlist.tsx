@@ -1,60 +1,124 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getCars, deleteCar } from "../api/carapi";
+import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
+import { Snackbar } from "@mui/material";
+import { useState } from "react";
+import AddCar from "./AddCar";
 
-// CarResponse 타입이 정의되어 있다고 가정합니다.
-// interface CarResponse { ... }
+export default function Carlist() {
+  const [ open, setOpen ] = useState(false);
+  const queryClient = useQueryClient();
 
-function Carlist() {
-    const getCars = async (): Promise<CarResponse[]> => {
-        const response = await axios.get('http://localhost:8080/api/vehicles');
-        return response.data._embedded.cars;
-    };
-
-    // 1. isSuccess 대신 isPending(로딩 중)과 isError(에러 발생)를 사용합니다.
-    const { data, isPending, isError } = useQuery({
-        queryKey: ['cars'],
-        queryFn: getCars
-    });
-
-    // 2. 논리 순서 수정: 로딩 중인지 먼저 확인하고, 그다음 에러를 확인합니다.
-    if (isPending) {
-        return <span>Loading ... ⏱️</span>;
-    } 
-    
-    if (isError) {
-        return <span>자동차를 불러오는 데에 오류가 발생하였습니다.</span>;
+  const columns: GridColDef[] = [
+    {field: 'brand', headerName: '제조사', width: 250, },
+    {field: 'model', headerName: '모델명', width: 250, },
+    {field: 'color', headerName: '색상', width: 200, },
+    {field: 'registrationNumber', headerName: '차량 번호', width: 300, },
+    {field: 'modelYear', headerName: '연식', width: 200, },
+    {field: 'price', headerName: '가격', width: 200, },
+    {
+      field: 'delete',
+      headerName: '',
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params: GridCellParams) => (
+        <button onClick={() => 
+          {if(confirm(`${params.row.brand}의 ${params.row.color} ${params.row.model}을(를) 삭제하시겠습니까?`))
+          {
+            mutate(params.row._links.self.href)
+          }}
+        }>Delete</button>
+      )
     }
+  ]
 
-    // 3. data가 확실히 존재할 때 렌더링합니다.
-    return (
-        <table>
-            <thead>
-                <tr>
-                    <th>Brand</th>
-                    <th>Model</th>
-                    <th>Color</th>
-                    <th>Registration</th>
-                    <th>Year</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    // 4. 문법 수정: 매개변수에 소괄호()를 치고, 반환값에는 소괄호()를 사용해 return을 생략합니다.
-                    data.map((car: CarResponse) => (
-                        <tr key={car._links.self.href}>
-                            <td>{car.brand}</td>
-                            <td>{car.model}</td>
-                            <td>{car.color}</td>
-                            <td>{car.registrationNumber}</td>
-                            <td>{car.modelYear}</td>
-                            <td>{car.price}</td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table>
+  const { data, error, isSuccess } = useQuery({
+    queryKey: ['cars'],
+    queryFn: getCars
+  });
+
+  const { mutate } = useMutation({
+    mutationFn: deleteCar, // v5 객체 형태 문법
+    onSuccess: () => {
+      setOpen(true)
+      // 삭제 성공 시 'cars' 쿼리를 무효화하여 목록을 자동 갱신합니다.
+      queryClient.invalidateQueries({ queryKey: ['cars'] });
+      alert("삭제되었습니다.");
+    },
+    onError: (err) => {
+      console.error(err);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  });
+
+  if(!isSuccess) {
+    return <span>Loading ... ⏱️</span>
+  }
+  else if (error) {
+    return <span>자동차 데이터를 가져오던 중 오류가 발생했습니다... 😂</span>
+  }
+  else {
+    return(
+      <>
+        <AddCar />
+        <DataGrid
+          rows={data}
+          columns={columns}
+          disableRowSelectionOnClick={true}
+          getRowId={row => row._links.self.href}
+        />
+        <Snackbar
+          open={open}
+          autoHideDuration={2000}
+          onClose={() => setOpen(false)}
+          message='해당 차량 정보가 삭제되었습니다.'
+        />
+      </>
     );
+  }
 }
 
-export default Carlist;
+// import { useQuery } from "@tanstack/react-query";
+// import { CarResponse } from "../types";
+// import axios from 'axios';
+
+// export default function Carlist() {
+//   const getCars = async () : Promise<CarResponse[]> => {
+//     const response = await axios.get('http://localhost:8080/api/vehicles');
+
+//     return response.data._embedded.cars;
+//   }
+
+//   const { data, error, isSuccess } = useQuery({
+//     queryKey: ['cars'],
+//     queryFn: getCars
+//   });
+
+//   if(!isSuccess) {
+//     return <span>Loading ... ⏱️</span>
+//   }
+//   else if (error) {
+//     return <span>자동차 데이터를 가져오던 중 오류가 발생했습니다... 😂</span>
+//   }
+//   else {
+//     return(
+//       <table>
+//         <tbody>
+//           {
+//             data.map((car: CarResponse) => 
+//               <tr key={car._links.self.href}>
+//                 <td>{car.brand}</td>
+//                 <td>{car.model}</td>
+//                 <td>{car.color}</td>
+//                 <td>{car.registrationNumber}</td>
+//                 <td>{car.modelYear}</td>
+//                 <td>{car.price}</td>
+//               </tr>
+//             )
+//           }
+//         </tbody>
+//       </table>
+//     );
+//   }
+// }
