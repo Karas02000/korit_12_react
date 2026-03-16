@@ -17,6 +17,7 @@
 
 /* =========================================
    2. <button> -> MUI <Button variant="contained"> 스타일
+   (모든 버튼이 파란색으로 통일됩니다)
    ========================================= */
 button {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -24,7 +25,7 @@ button {
   font-size: 0.875rem;
   line-height: 1.75;
   letter-spacing: 0.02857em;
-  text-transform: uppercase; /* 영문일 경우 대문자 변환 */
+  text-transform: uppercase;
   min-width: 64px;
   padding: 6px 16px;
   border-radius: 4px;
@@ -48,19 +49,14 @@ button:active {
   box-shadow: 0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12);
 }
 
-/* DataGrid 셀 안의 버튼 (Delete 등)은 MUI Error(빨간색) 버튼으로 설정 */
+/* DataGrid 셀 안의 버튼 레이아웃 조정 (색상은 파란색 그대로 유지) */
 .MuiDataGrid-cell button {
-  background-color: #d32f2f;
-  margin: 0; /* 표 안에서는 여백 제거 */
-}
-
-.MuiDataGrid-cell button:hover {
-  background-color: #c62828;
+  margin: 0 4px; 
+  padding: 4px 10px; /* 셀 높이를 넘치지 않도록 패딩을 살짝 줄임 */
 }
 
 /* =========================================
    3. <input> -> MUI <TextField variant="outlined"> 스타일
-   (AddCar, EditCar 모달 창 내부 입력칸 등)
    ========================================= */
 input[type="text"],
 input[type="number"] {
@@ -71,37 +67,31 @@ input[type="number"] {
   color: rgba(0, 0, 0, 0.87);
   box-sizing: border-box;
   
-  /* MUI Outlined TextField 크기 및 여백 */
   padding: 16.5px 14px;
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.23);
   background-color: transparent;
   
-  /* 다이얼로그 안에서 예쁘게 꽉 차게 보이도록 설정 */
   width: 100%;
   max-width: 450px; 
   margin-top: 8px;
-  margin-bottom: 8px; /* 기존 tsx의 <br />을 커버하는 여백 */
+  margin-bottom: 8px; 
   
   transition: border-color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms, border-width 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
 }
 
-/* 마우스 올렸을 때 테두리 진하게 */
 input[type="text"]:hover,
 input[type="number"]:hover {
   border-color: rgba(0, 0, 0, 0.87);
 }
 
-/* 클릭(포커스) 했을 때 MUI Primary(파란색) 테두리로 강조 */
 input[type="text"]:focus,
 input[type="number"]:focus {
   outline: none;
   border: 2px solid #1976d2;
-  /* 테두리가 2px로 두꺼워지면서 레이아웃이 밀리는 것을 방지하기 위해 패딩 1px 축소 */
   padding: 15.5px 13px; 
 }
 
-/* placeholder 글씨체 다듬기 */
 input::placeholder {
   color: rgba(0, 0, 0, 0.6);
   opacity: 1;

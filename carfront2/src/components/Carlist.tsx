@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCars, deleteCar } from "../api/carapi";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
-import { Snackbar } from "@mui/material";
+import { Snackbar, Container, Button } from "@mui/material";
 import { useState } from "react";
 import AddCar from "./AddCar";
 import EditCar from "./EditCar";
@@ -33,12 +33,12 @@ export default function Carlist() {
       filterable: false,
       disableColumnMenu: true,
       renderCell: (params: GridCellParams) => (
-        <button onClick={() => 
+        <Button onClick={() => 
           {if(confirm(`${params.row.brand}의 ${params.row.color} ${params.row.model}을(를) 삭제하시겠습니까?`))
           {
             mutate(params.row._links.self.href)
           }}
-        }>Delete</button>
+        }>Delete</Button>
       )
     }
   ]
@@ -63,10 +63,10 @@ export default function Carlist() {
   });
 
   if(!isSuccess) {
-    return <span>Loading ... ⏱️</span>
+    return <Container>Loading ... ⏱️</Container>
   }
   else if (error) {
-    return <span>자동차 데이터를 가져오던 중 오류가 발생했습니다... 😂</span>
+    return <Container>자동차 데이터를 가져오던 중 오류가 발생했습니다... 😂</Container>
   }
   else {
     return(
@@ -88,47 +88,3 @@ export default function Carlist() {
     );
   }
 }
-
-// import { useQuery } from "@tanstack/react-query";
-// import { CarResponse } from "../types";
-// import axios from 'axios';
-
-// export default function Carlist() {
-//   const getCars = async () : Promise<CarResponse[]> => {
-//     const response = await axios.get('http://localhost:8080/api/vehicles');
-
-//     return response.data._embedded.cars;
-//   }
-
-//   const { data, error, isSuccess } = useQuery({
-//     queryKey: ['cars'],
-//     queryFn: getCars
-//   });
-
-//   if(!isSuccess) {
-//     return <span>Loading ... ⏱️</span>
-//   }
-//   else if (error) {
-//     return <span>자동차 데이터를 가져오던 중 오류가 발생했습니다... 😂</span>
-//   }
-//   else {
-//     return(
-//       <table>
-//         <tbody>
-//           {
-//             data.map((car: CarResponse) => 
-//               <tr key={car._links.self.href}>
-//                 <td>{car.brand}</td>
-//                 <td>{car.model}</td>
-//                 <td>{car.color}</td>
-//                 <td>{car.registrationNumber}</td>
-//                 <td>{car.modelYear}</td>
-//                 <td>{car.price}</td>
-//               </tr>
-//             )
-//           }
-//         </tbody>
-//       </table>
-//     );
-//   }
-// }
