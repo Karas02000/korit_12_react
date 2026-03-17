@@ -1,83 +1,84 @@
-import { useState, ChangeEvent } from "react";
-import { CarResponse, Car, CarEntry } from "../type";
+import { useState } from "react";
+import { CarResponse, Car, CarEntry } from "../types";
 import { Dialog, DialogActions, DialogTitle, Button } from "@mui/material";
 import CarDialogContent from "./CarDialogContent";
 import { updateCar } from "../api/carapi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import EditIcon from '@mui/icons-material/Edit';
 
 type FormProps = {
-    cardata: CarResponse;
+  cardata: CarResponse;
 }
 
 export default function EditCar({ cardata } : FormProps) {
-    const [ open, setOpen ] = useState(false);
-    const [ car, setCar ] = useState<Car>({
-        brand: (''),
-        model: (''),
-        color: (''),
-        registrationNumber: (''),
-        modelYear: (0),
-        price: (0)
+  const [ open, setOpen ] = useState(false);
+  const [ car, setCar ] = useState<Car>({
+    brand: '',
+    model: '',
+    color: '',
+    registrationNumber: '',
+    modelYear: 0,
+    price: 0
+  });
+
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: updateCar,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cars'] });
+    },
+    onError: (err) => {
+      console.log(err);
+    }
+  });
+
+  const handleClickOpen = () => {
+    setCar({
+      brand: cardata.brand,
+      model: cardata.model,
+      color: cardata.color,
+      registrationNumber: cardata.registrationNumber,
+      modelYear: cardata.modelYear,
+      price: cardata.price
     });
+    setOpen(true);
+  }
 
-    const queryClient = useQueryClient();
-    const { mutate } = useMutation({
-            mutationFn: updateCar,
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['cars'] });
-            },
-            onError: (err: unknown) => {console.log(err);}
-        });
+  const handleClickClose = () => {
+    setOpen(false);
+  }
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setCar({...car, [event.target.name]: event.target.value});
-    }
+  const handleSave = () => {
+    const url = cardata._links.self.href;
+    const carEntry : CarEntry = {car, url};
+    mutate(carEntry);
+    setCar({
+      brand: '',
+      model: '',
+      color: '',
+      registrationNumber: '',
+      modelYear: 0,
+      price: 0
+    });
+    setOpen(false);
+  }
 
-    const handleClickOpen = () => {
-        setCar({
-            brand: (cardata.brand),
-            model: (cardata.model),
-            color: (cardata.color),
-            registrationNumber: (cardata.registrationNumber),
-            modelYear: (cardata.modelYear),
-            price: (cardata.price)
-        });
-        setOpen(true);
-    }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCar({...car, [event.target.name]: event.target.value});
+  }
 
-    const handleClickClose = () => {
-        setOpen(false);
-    }
-
-    const handleSave = () => {
-        const url = cardata._links.self.href;
-        const carEntry : CarEntry = {car, url};
-        mutate(carEntry);
-        setCar({
-            brand: (''),
-            model: (''),
-            color: (''),
-            registrationNumber: (''),
-            modelYear: (0),
-            price: (0)
-        });
-        setOpen(false)
-    }
-    
-    return(
-        <>
-            <Button onClick={handleClickOpen}>
-                <EditIcon />
-            </Button>
-            <Dialog open={open} onClose={handleClickClose}>
-                <DialogTitle>EditCar</DialogTitle>
-                <CarDialogContent car={car} handleChange={handleChange} />
-                <DialogActions>
-                    <Button onClick={handleClickClose}>Cancle</Button>
-                    <Button onClick={handleSave}>Save</Button>
-                </DialogActions>
-            </Dialog>
-        </>
-    );
+  return(
+    <>
+      <Button size='small' onClick={handleClickOpen}>
+        Edit
+      </Button>
+      <Dialog open={open} onClose={handleClickClose}>
+        <DialogTitle>Edit Car</DialogTitle>
+        <CarDialogContent car={car} handleChange={handleChange} />
+        <DialogActions>
+          <Button onClick={handleClickClose}>Cancel</Button>
+          <Button onClick={handleSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }

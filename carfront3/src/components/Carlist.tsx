@@ -1,32 +1,36 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCars, deleteCar } from "../api/carapi";
-import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
-import { Snackbar, Container, Button, IconButton, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { DataGrid, GridColDef, GridCellParams, GridToolbar } from "@mui/x-data-grid";
+import { Snackbar, IconButton, Tooltip, Stack, Button } from "@mui/material";
+import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import { useState } from "react";
 import AddCar from "./AddCar";
 import EditCar from "./EditCar";
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
-export default function Carlist() {
-  const [open, setOpen] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCar, setSelectedCar] = useState(null);
+type CarlistProps = {
+  logout? : () => void;
+}
+
+export default function Carlist({logout} : CarlistProps) {
+  const [ open, setOpen ] = useState(false)
   const queryClient = useQueryClient();
 
+  
+  
   const columns: GridColDef[] = [
-    { field: 'brand', headerName: '제조사', width: 250 },
-    { field: 'model', headerName: '모델명', width: 250 },
-    { field: 'color', headerName: '색상', width: 200 },
-    { field: 'registrationNumber', headerName: '차량 번호', width: 300 },
-    { field: 'modelYear', headerName: '연식', width: 200 },
-    { field: 'price', headerName: '가격', width: 200 },
+    {field: 'brand', headerName: 'Brand', width: 200,},
+    {field: 'model', headerName: 'Model', width: 200,},
+    {field: 'color', headerName: 'Color', width: 200,},
+    {field: 'registrationNumber', headerName: 'Reg.No.', width: 200,},
+    {field: 'modelYear', headerName: 'Year', width: 200,},
+    {field: 'price', headerName: 'Price', width: 200,},
     {
       field: 'edit',
       headerName: '',
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      renderCell: (params: GridCellParams) => <EditCar cardata={params.row} />
+      renderCell: (params: GridCellParams) => <EditCar cardata={params.row}/>
     },
     {
       field: 'delete',
@@ -35,22 +39,20 @@ export default function Carlist() {
       filterable: false,
       disableColumnMenu: true,
       renderCell: (params: GridCellParams) => (
-        <Tooltip title="delete car">
-          <IconButton
-            aria-label="delete"
-            size="small"
+        <Tooltip title='delete car'>
+          <IconButton aria-label='delete' size='small'
             onClick={() => {
-              if (window.confirm(`${params.row.brand}의 ${params.row.color} ${params.row.model}을(를) 삭제하시겠습니까?`)) {
+              if(confirm(`${params.row.brand}의 ${params.row.color} ${params.row.model}을 삭제하시겠습니까?`)) {
                 mutate(params.row._links.self.href);
               }
             }}
           >
-            <DeleteForeverIcon />
+            <DeleteForeverRoundedIcon fontSize="small"/> 
           </IconButton>
         </Tooltip>
       )
-    }
-  ];
+    },
+  ]
 
   const { data, error, isSuccess } = useQuery({
     queryKey: ['cars'],
@@ -61,57 +63,40 @@ export default function Carlist() {
     mutationFn: deleteCar,
     onSuccess: () => {
       setOpen(true);
-      queryClient.invalidateQueries({ queryKey: ['cars'] });
+      queryClient.invalidateQueries({ queryKey: [ 'cars' ]});
     },
-    onError: (err) => {
-      console.error(err);
-      setOpen(true); // 오류 시에도 Snackbar 표시 (메시지 변경 가능)
-    }
-  });
+    onError: (err: Error) => {
+      console.log(err);
+    },
+  })
 
-  const handleDeleteConfirm = () => {
-    if (selectedCar) {
-      mutate(selectedCar._links.self.href);
-      setDialogOpen(false);
-      setSelectedCar(null);
-    }
-  };
-
-  if (!isSuccess) {
-    return <Container>Loading ... ⏱️</Container>;
-  } else if (error) {
-    return <Container>자동차 데이터를 가져오던 중 오류가 발생했습니다... 😂</Container>;
-  } else {
-    return (
+  if(!isSuccess) {
+    return <span>Loading ... ⏱️</span>
+  }
+  else if (error) {
+    return <span>자동차 데이터를 가져오던 중 오류가 발생했습니다... 😂</span>
+  }
+  else {
+    return(
       <>
-        <AddCar />
-        <DataGrid
+        <Stack direction='row' alignItems={'center'} justifyContent={"space-between"}>
+          <AddCar />
+          <Button onClick={logout}>Logout</Button>
+        </Stack>
+        
+        <DataGrid 
           rows={data}
           columns={columns}
           disableRowSelectionOnClick={true}
           getRowId={row => row._links.self.href}
-        />
-        <Snackbar
+          slots={{ toolbar: GridToolbar }}
+        /> 
+        <Snackbar 
           open={open}
           autoHideDuration={2000}
           onClose={() => setOpen(false)}
-          message={error ? "삭제 중 오류가 발생했습니다." : "해당 차량 정보가 삭제되었습니다."}
+          message='해당 차량 정보가 삭제되었습니다🚔'
         />
-        <Dialog
-          open={dialogOpen}
-          onClose={() => setDialogOpen(false)}
-        >
-          <DialogTitle>삭제 확인</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {selectedCar ? `${selectedCar.brand}의 ${selectedCar.color} ${selectedCar.model}을(를) 삭제하시겠습니까?` : ""}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDialogOpen(false)}>취소</Button>
-            <Button onClick={handleDeleteConfirm} color="error">삭제</Button>
-          </DialogActions>
-        </Dialog>
       </>
     );
   }
